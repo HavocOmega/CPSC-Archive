@@ -5,6 +5,7 @@ def IsPrime(value):
         if i != 1 and i != value and value % i == 0:
             return False
     return True
+    print(value + " is prime")
     
 largestPrimeFactor = 0
     
@@ -13,5 +14,6 @@ for i in range(600851475):
         continue
     if 600851475 % i == 0:
         if IsPrime(i) and i > largestPrimeFactor:
-                largestPrimeFactor = i
+           largestPrimeFactor = i
+           print("New Largest Prime Factor: " + str(largestPrimeFactor))
 print(largestPrimeFactor)

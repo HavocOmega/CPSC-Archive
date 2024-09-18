@@ -14,7 +14,10 @@ thirty_day_months = ["April", "June", "September", "November"]
 # Months with 31 days
 thirty_one_day_months = ["January", "March", "May", "July", "August", "October", "December"]
 
-# Dictionary of all wanted problems
+minimum_year = 1999
+maximum_year = 2024
+
+# Dictionary of all questions
 questions = {
     'is_citizen': "Are you a Canadian citizen?",
     'is_resident': "Are you a resident of Alberta?",
@@ -22,6 +25,20 @@ questions = {
     'birth_day': "What is the day of your birth date?",
     'birth_year': "What is the year of your birth date?"
 }
+
+valued_months = {
+    "January": 1, 
+    "February": 2, 
+    "March": 3, 
+    "April": 4, 
+    "May": 5, 
+    "June": 6, 
+    "July": 7, 
+    "August": 8, 
+    "September": 9, 
+    "October": 10, 
+    "November": 11, 
+    "December": 12}
 
 # Hash table of responses to questions to store for later (tbh idk why i store them it's just convenient for later)
 stored_responses = {}
@@ -46,9 +63,8 @@ def isResponseValid(question, value):
                         if intValue > 29:
                             print("Invalid birth date.")
                             return 2;
-                        
             case 'birth_year':
-                if intValue < 1900 or intValue > 2024:
+                if intValue < minimum_year or intValue > maximum_year:
                     print("Invalid birth date.")
                     return 2;
             case _:
@@ -69,9 +85,21 @@ def askQuestions():
             print("EXIT CODE: " + str(isValid))
             quit(isValid)
             
+def validateBirth():
+    if int(stored_responses["birth_year"]) == maximum_year:
+        if valued_months[stored_responses["birth_month"]] > 9:
+            print("Invalid birth date.")
+            print("EXIT CODE: 2")
+            quit(2)
+        elif valued_months[stored_responses["birth_month"]] == 9:
+            if int(stored_responses["birth_day"]) > 27:
+                print("Invalid birth date.")
+                print("EXIT CODE: 2")
+                quit(2)
+        
 def initialize():
     askQuestions()
-    
+    validateBirth()
 
 # Initialize program
 initialize()
