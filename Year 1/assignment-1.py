@@ -1,3 +1,5 @@
+# Note: Ignore the exit code stuff, I just used it to debug and just know where my code is at in the process
+
 # Assignment 1
 # Written by: Ryll
 
