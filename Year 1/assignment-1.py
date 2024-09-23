@@ -114,7 +114,7 @@ def validateBirth():
                 
 # Function to check the user's eligibility to vote
 def voterEligibilityCheck():
-    # Check if the USER SATIFIES 
+    # Check if the user satisfies the voter conditions 
     if stored_responses["is_citizen"] == "Yes" or stored_responses["is_citizen"] == "yes":
         if stored_responses["is_resident"] == "Yes" or stored_responses["is_resident"] == "yes":
             if (maximum_year - int(stored_responses["birth_year"])) == 18:
@@ -125,13 +125,13 @@ def voterEligibilityCheck():
             elif (maximum_year - int(stored_responses["birth_year"])) > 18:
                 print("You are eligible to vote.")
                 exit()
-        
+    # When one of the if conditionals is not satisfied default to the user being ineligible to vote
     print("You are not eligible to vote.")
     exit()
     
 # Initialize function
 def initialize():
-    askQuestions()
+    askQuestions() # Trigger 
     validateBirth()
     voterEligibilityCheck()
 
