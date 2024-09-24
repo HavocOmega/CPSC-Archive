@@ -52,7 +52,7 @@ def isResponseValid(question, value):
     if value.isdigit(): #Check if the response is a digit
         intValue = int(value) #Convert the response to an integer
         match question:
-            case 'birth_day':`
+            case 'birth_day':
                 #Check if the user's day of birth is either 0 or negative
                 if intValue < 1:
                     print("Invalid birth date.")
