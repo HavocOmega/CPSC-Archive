@@ -53,28 +53,7 @@ def isResponseValid(question, value):
         intValue = int(value) #Convert the response to an integer
         match question:
             case 'birth_day':
-                #Check if the user's day of birth is either 0 or negative
-                if intValue < 1:
-                    print("Invalid birth date.")
-                    return 2;
-                
-                #Retrieve birth month value
-                birth_month = stored_responses["birth_month"]
-                
-                #Check if the user's day of birth is a valid day within that month
-                match birth_month:
-                    case birth_month if birth_month in thirty_day_months:
-                        if intValue > 30:
-                            print("Invalid birth date.")
-                            return 2;
-                    case birth_month if birth_month in thirty_one_day_months:
-                        if intValue > 31:
-                            print("Invalid birth date.")
-                            return 2;
-                    case _:
-                        if intValue > 29:
-                            print("Invalid birth date.")
-                            return 2;
+                return 0;
             case 'birth_year':
                 #Check if the inputted year is a valid year within the given range
                 if intValue < minimum_year or intValue > maximum_year:
@@ -102,6 +81,35 @@ def askQuestions():
             
 #Function to validate the user's birthday
 def validateBirth():
+    birth_day = int(stored_responses["birth_day"])
+    #Check if the user's day of birth is either 0 or negative
+    if birth_day < 1:
+        print("Invalid birth date.")
+        exit(2)
+    
+    #Retrieve birth month value
+    birth_month = stored_responses["birth_month"]
+    
+    #Check if the user's day of birth is a valid day within that month
+    match birth_month:
+        case birth_month if birth_month in thirty_day_months:
+            if birth_day > 30:
+                print("Invalid birth date.")
+                exit(2)
+        case birth_month if birth_month in thirty_one_day_months:
+            if birth_day > 31:
+                print("Invalid birth date.")
+                exit(2)
+        case _:
+            if ((year % 400 == 0) and (year % 100 == 0)) or ((year % 4 ==0) and (year % 100 != 0)):
+                if birth_day > 29:
+                    print("Invalid birth date.")
+                    exit(2)
+            else:
+                if birth_day > 28:
+                    print("Invalid birth date.")
+                    exit(2)
+    
     if int(stored_responses["birth_year"]) == maximum_year:
         if valued_months[stored_responses["birth_month"]] > 9: #If the month inputted is a month that is past September then it's invalid
             print("Invalid birth date.")
