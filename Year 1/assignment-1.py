@@ -101,6 +101,7 @@ def validateBirth():
                 print("Invalid birth date.")
                 exit(2)
         case _:
+            # Check if the year inputted is a leap year or not
             if ((year % 400 == 0) and (year % 100 == 0)) or ((year % 4 ==0) and (year % 100 != 0)):
                 if birth_day > 29:
                     print("Invalid birth date.")
@@ -125,8 +126,7 @@ def validateBirth():
 def voterEligibilityCheck():
     #Check if the user satisfies the voter conditions 
     #Nested if statement hell
-    if stored_responses["is_citizen"] == "Yes" or stored_responses["is_citizen"] == "yes":
-        if stored_responses["is_resident"] == "Yes" or stored_responses["is_resident"] == "yes":
+    if (stored_responses["is_citizen"] == "Yes" or stored_responses["is_citizen"] == "yes") and (stored_responses["is_resident"] == "Yes" or stored_responses["is_resident"] == "yes"):
             if (maximum_year - int(stored_responses["birth_year"])) == 18:
                 if (int(valued_months[stored_responses["birth_month"]]) - 9) <= 0:
                     if int(stored_responses["birth_day"]) <= 27:
