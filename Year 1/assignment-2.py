@@ -1,22 +1,27 @@
 #Assignment 2
 #Written by: Ryll Santillan
+#UCID: 30257967
 
+# Setup Variables
 amtOfDataPoints = 0
 fertility_data = {}
 
+# Loop until the inputted amount of data points is greater than or equal to 2 data points
 while amtOfDataPoints < 2:
     data_points_input = input("How many data points do you have? ")
-    if int(data_points_input) >= 2:
+    if int(data_points_input) >= 2: #Check if input is greater than or wual to 2
         amtOfDataPoints = int(data_points_input)
     else:
         print("Must enter at least two data points.")
 
+# Query for year and fertility data
 for i in range(int(amtOfDataPoints)):
     year_input = input("What is the year of data point " + str(i + 1) + "? ")
     fertility_input = input("What is the fertility rate of data point " + str(i + 1) + "? ")
 
-    fertility_data[year_input] = fertility_input
+    fertility_data[year_input] = fertility_input #Store fertility data by the year in an array (Using an array is super convenient because it allows to override pre-existing values wihtout any extra work)
 
+#Nested if statement hell
 start_year = input("Which year would you like to start with? ")
 if fertility_data[start_year]:
     end_year = input("Which year would you like to end with? ")
