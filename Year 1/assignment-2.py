@@ -15,9 +15,9 @@ while amtOfDataPoints < 2:
         print("Must enter at least two data points.")
 
 # Query for year and fertility data
-for i in range(int(amtOfDataPoints)):
-    year_input = input("What is the year of data point " + str(i + 1) + "? ")
-    fertility_input = input("What is the fertility rate of data point " + str(i + 1) + "? ")
+while len(fertility_data) < amtOfDataPoints:
+    year_input = input("What is the year of data point " + str(len(fertility_data) + 1) + "? ")
+    fertility_input = input("What is the fertility rate of data point " + str(len(fertility_data) + 1) + "? ")
 
     fertility_data[year_input] = fertility_input #Store fertility data by the year in an array (Using an array is super convenient because it allows to override pre-existing values wihtout any extra work)
 
