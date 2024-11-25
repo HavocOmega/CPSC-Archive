@@ -1,3 +1,8 @@
+# Assignment 3
+# Written by: Ryll Santillan
+# UCID: 30257967
+
+
 # Greeting function
 def get_greetings(name):
     return f"Greetings {name}! I am your virtual assistant Chat231." # Return a string with the name variable embeded into it
