@@ -89,8 +89,6 @@ class Board:
             desired_pos = [player[0] + player_direction[0], player[1] + player_direction[1]]
             current_occupant = self.currentBoard[desired_pos[0]][desired_pos[1]]
 
-
-            print("Current occupant: " + current_occupant)
             if current_occupant == "#":
                 self.dead.append(bot_index)
                 self.currentBoard[player[0]][player[1]] = " "
@@ -105,19 +103,24 @@ class Board:
                 new_coords[bot_index] = desired_pos
 
         while len(queued_bots) > 0:
+            print(queued_bots)
             for key in list(queued_bots.keys()):
+                print(key)
                 v = queued_bots[key]
                 occupant_index = self.players.index(v)
-                
+                print(v," ",occupant_index)
+
+
                 if new_coords[occupant_index] is not None:
-                    new_coords[occupant_index] = v
+                    new_coords[key] = v
                     del queued_bots[key]
 
+        print(new_coords)
         for pos in new_coords:
             if pos != None:
                 bot_index = new_coords.index(pos)
-                self.currentBoard[self.players[bot_index][0]][self.players[bot_index][1]] = " "
                 self.currentBoard[pos[0]][pos[1]] = "P"
+                self.currentBoard[self.players[bot_index][0]][self.players[bot_index][1]] = " "
                 self.players[bot_index] = pos
 
         print()
