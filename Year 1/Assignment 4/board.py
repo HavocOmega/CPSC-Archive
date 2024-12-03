@@ -23,6 +23,7 @@ class Board:
         self.steps = 0
         self.escaped = []
         self.dead = []
+        self.inactive = []
 
         self.currentBoard = None
 
@@ -67,63 +68,58 @@ class Board:
         return
     
     def get_board(self):
-        if self.currentBoard != None:
-            return self.currentBoard
-        
-        self.currentBoard = self.map
+        game_board = [i[:] for i in self.map]
+
         for player in range(len(self.players)):
-            self.currentBoard[self.players[player][0]][self.players[player][1]] = "P"
+            game_board[self.players[player][0]][self.players[player][1]] = "P"
 
-        self.currentBoard[self.exit[0]][self.exit[1]] = "E"
+        game_board[self.exit[0]][self.exit[1]] = "E"
 
-        return self.currentBoard
+        return game_board
      
     def update(self, direction):
-        new_coords = [None]*len(self.players)
-        queued_bots = {}
         player_direction = directions[direction]
+        direction_index =  0 if (direction == "U" or direction == "D") else 1
+        new_coords = [i[:] for i in self.players]
+        game_board = self.get_board()
 
-        for player in self.players:
-            bot_index = self.players.index(player)
-            if bot_index in self.dead or bot_index in self.escaped: continue
-            desired_pos = [player[0] + player_direction[0], player[1] + player_direction[1]]
-            current_occupant = self.currentBoard[desired_pos[0]][desired_pos[1]]
+        self.steps += 1
+        
+        n = len(new_coords)
+        for i in range(n):
+            swapped = False
+            for j in range(0, n-i-1):
+                if new_coords[j][direction_index] > new_coords[j+1][direction_index]:
+                    new_coords[j], new_coords[j+1] = new_coords[j+1], new_coords[j]
+                swapped = True
+            if (swapped == False):
+                break
 
-            if current_occupant == "#":
-                self.dead.append(bot_index)
-                self.currentBoard[player[0]][player[1]] = " "
-            elif current_occupant == "E":
-                self.escaped.append(bot_index)
-                self.currentBoard[player[0]][player[1]] = " "
-            elif not isPlacementValid(desired_pos):
-                new_coords[bot_index] = None
-            elif current_occupant == "P":
-                queued_bots[bot_index] = desired_pos
+        if player_direction[direction_index] > 0:
+            new_coords.reverse()
+
+        for i in range(len(new_coords)):
+            position = new_coords[i]
+            desired_position = [position[0] + player_direction[0], position[1] + player_direction[1]]
+
+            if not isPlacementValid(desired_position):
+                new_coords[i] = new_coords[i]
             else:
-                new_coords[bot_index] = desired_pos
+                current_occupant = game_board[desired_position[0]][desired_position[1]]
+                if current_occupant == "#":
+                    self.dead.append(i)
+                    self.inactive.append(i)
+                elif current_occupant == "E":
+                    self.escaped.append(i)
+                    self.inactive.append(i)
+                elif desired_position in new_coords:
+                    new_coords[i] = new_coords[i]
+                else:
+                    new_coords[i] = desired_position
+        
+        
 
-        while len(queued_bots) > 0:
-            print(queued_bots)
-            for key in list(queued_bots.keys()):
-                print(key)
-                v = queued_bots[key]
-                occupant_index = self.players.index(v)
-                print(v," ",occupant_index)
-
-
-                if new_coords[occupant_index] is not None:
-                    new_coords[key] = v
-                    del queued_bots[key]
-
-        print(new_coords)
-        for pos in new_coords:
-            if pos != None:
-                bot_index = new_coords.index(pos)
-                self.currentBoard[pos[0]][pos[1]] = "P"
-                self.currentBoard[self.players[bot_index][0]][self.players[bot_index][1]] = " "
-                self.players[bot_index] = pos
-
-        print()
+        self.players = new_coords
         return
     
     def get_state(self):
@@ -140,10 +136,53 @@ class Board:
         return state
     
     def save_map(self):
+        save_file = open("./save.txt", "w")
+        for i in range(len(self.map)):
+            current_line = self.map[i]
+            line = ""
+            for j in range(len(current_line)):
+                line = line + current_line[j]
+            save_file.write(line + "\n")
+
+        for i in range(len(self.players)):
+            save_file.write(str(self.players[i][0]) + " " + str(self.players[i][1]) + " ")
+        save_file.write("\n")
+
+        save_file.write(str(self.exit[0]) + " " + str(self.exit[1]) + "\n")
+
+        save_file.write(str(self.steps) + "\n")
+
+        save_file.close()
         return
     
     def load_map(self):
+        save_file = open("./save.txt")
+
+        loaded_map = []
+        for i in range(12):
+            current_line = save_file.readline().split("\n")[0]
+            line = []
+            for j in range(16):
+                line.append(current_line[j])
+            loaded_map.append(line)
+
+        current_line = save_file.readline().split("\n")[0].split(" ")
+        current_line.pop(len(current_line) - 1)
+
+        loaded_players = []
+        for i in range(0, len(current_line), 2):
+            loaded_players.append([int(current_line[i]), int(current_line[i + 1])])
+
+        loaded_exit = save_file.readline().split("\n")[0].split(" ")
+        loaded_exit = [int(i) for i in self.exit]
+
+        self.map = loaded_map
+        self.players = loaded_players
+        self.exit = loaded_exit
+        self.steps = int(save_file.readline().split("\n")[0])
+
+        save_file.close()
         return
     
     def get_steps(self):
-        return
+        return self.steps
