@@ -5,27 +5,19 @@
 # Note: Develop algorithm for collision detection
 # Ideas so far are to read each line or just keep checking in that general direction for an answer
 
-directions = {
-    "U": [-1,0],
-    "D": [1, 0],
-    "L": [0,-1],
-    "R": [0,1]
-}
-
-def isPlacementValid(Position: list):
-    if (Position[0] < 0 or Position[1] < 0) or (Position[0] > 11 or Position[1] > 15):
-        return False
-    return True
-
-
 class Board: 
     def __init__(self):
         self.steps = 0
+        self.player_count = 0
         self.escaped = []
         self.dead = []
-        self.inactive = []
 
-        self.currentBoard = None
+        self.directions = {
+            "U": [-1,0],
+            "D": [1, 0],
+            "L": [0,-1],
+            "R": [0,1]
+        }
 
         self.map = []
         self.players = []
@@ -37,7 +29,10 @@ class Board:
                 current_line = map_file.readline().split("\n")[0]
                 line = []
                 for j in range(16):
-                    line.append(current_line[j])
+                    if current_line[j] == "#":
+                        line.append("#")
+                    else:
+                        line.append(" ")
                 self.map.append(line)
             map_file.close()
         except IndexError as index_error:
@@ -48,6 +43,7 @@ class Board:
         try:
             player_file = open("./players.txt")
             player_count = len(player_file.readlines())
+            self.player_count = player_count
             player_file.seek(0,0)
             for i in range(player_count):
                 player_cords = player_file.readline().split("\n")[0].split(" ")
@@ -76,11 +72,17 @@ class Board:
         game_board[self.exit[0]][self.exit[1]] = "E"
 
         return game_board
+    
+    def isPlacementValid(self, Position: list):
+        if (Position[0] < 0 or Position[1] < 0) or (Position[0] > 11 or Position[1] > 15):
+            return False
+        return True
      
     def update(self, direction):
-        player_direction = directions[direction]
+        player_direction = self.directions[direction]
         direction_index =  0 if (direction == "U" or direction == "D") else 1
         new_coords = [i[:] for i in self.players]
+        inactive = []
         game_board = self.get_board()
 
         self.steps += 1
@@ -102,30 +104,35 @@ class Board:
             position = new_coords[i]
             desired_position = [position[0] + player_direction[0], position[1] + player_direction[1]]
 
-            if not isPlacementValid(desired_position):
+            if not self.isPlacementValid(desired_position):
                 new_coords[i] = new_coords[i]
             else:
                 current_occupant = game_board[desired_position[0]][desired_position[1]]
                 if current_occupant == "#":
                     self.dead.append(i)
-                    self.inactive.append(i)
+                    inactive.append(i)
+                    new_coords[i] = desired_position
                 elif current_occupant == "E":
                     self.escaped.append(i)
-                    self.inactive.append(i)
+                    inactive.append(i)
+                    new_coords[i] = desired_position
                 elif desired_position in new_coords:
                     new_coords[i] = new_coords[i]
                 else:
                     new_coords[i] = desired_position
-        
-        
+
+        for i in inactive:
+            new_coords.pop(i)
 
         self.players = new_coords
         return
     
     def get_state(self):
-        robot_amount = len(self.players)
+        robot_amount = self.player_count
         escaped_robots = len(self.escaped)
         dead_robots = len(self.dead)
+
+        print(escaped_robots, dead_robots, robot_amount)
         state = 0
         if escaped_robots == robot_amount and dead_robots == 0:
             state = 1
@@ -150,7 +157,15 @@ class Board:
 
         save_file.write(str(self.exit[0]) + " " + str(self.exit[1]) + "\n")
 
-        save_file.write(str(self.steps) + "\n")
+        for i in self.dead:
+            save_file.write(str(i) + " ")
+        save_file.write("\n")
+            
+        for i in self.escaped:
+            save_file.write(str(i) + " ")
+        save_file.write("\n")
+
+        save_file.write(str(self.steps) + " " + str(self.player_count) + "\n")
 
         save_file.close()
         return
@@ -176,10 +191,22 @@ class Board:
         loaded_exit = save_file.readline().split("\n")[0].split(" ")
         loaded_exit = [int(i) for i in self.exit]
 
+        current_line = save_file.readline().split("\n")[0].split(" ")
+        current_line.pop(len(current_line) - 1)
+        loaded_dead = [i for i in current_line]
+        current_line = save_file.readline().split("\n")[0].split(" ")
+        current_line.pop(len(current_line) - 1)
+        loaded_escaped = [i for i in current_line]
+
         self.map = loaded_map
         self.players = loaded_players
         self.exit = loaded_exit
-        self.steps = int(save_file.readline().split("\n")[0])
+        self.dead = loaded_dead
+        self.escaped = loaded_escaped
+
+        current_line = save_file.readline().split("\n")[0].split(" ")
+        self.steps = int(current_line[0])
+        self.player_count = int(current_line[1])
 
         save_file.close()
         return
